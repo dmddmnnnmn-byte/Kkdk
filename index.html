@@ -26,7 +26,7 @@
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background: #fdfbf7; /* لون خلفية ناعم */
+            background: #fdfbf7;
             color: var(--text-main);
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
@@ -127,12 +127,11 @@
             color: #fff;
         }
         
-        /* الخلفية المتحركة للأزرار */
         .nav-indicator {
             position: absolute;
             height: calc(100% - 16px);
             top: 8px;
-            left: 0; /* سيتم تحديثها بالجافاسكريبت */
+            left: 0;
             background: linear-gradient(135deg, #ff9f1c, #f37335);
             border-radius: 15px;
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -197,7 +196,6 @@
             border-color: var(--primary);
         }
 
-        /* تأثير اللمعان */
         .menu-card::before {
             content: '';
             position: absolute;
@@ -359,7 +357,7 @@
             </div>
         </div>
 
-        <!-- عنوان القسم الحالي (فوق الكروت) -->
+        <!-- عنوان القسم الحالي -->
         <div class="section-header-container" id="sectionHeader">
             <h2 class="section-title" id="sectionTitleText">المشويات</h2>
             <p class="section-subtitle" id="sectionSubtitleText">أشهى الأطباق المحضرة بعناية</p>
@@ -391,7 +389,6 @@
             </div>
 
             <div class="flex-grow overflow-y-auto custom-scroll mb-6 pr-2" id="cartItems">
-                <!-- عناصر السلة -->
                 <div class="text-center py-10 text-gray-400">
                     <i class="fa-solid fa-basket-shopping text-4xl mb-3 opacity-50"></i>
                     <p>السلة فارغة حالياً</p>
@@ -412,7 +409,7 @@
     </div>
 
     <script>
-        // --- البيانات ---
+        // --- البيانات المحدثة ---
         const menuData = [
             {
                 id: "grills",
@@ -437,19 +434,60 @@
                 ]
             },
             {
-                id: "chicken_box",
+                id: "rizzo_box",
                 title: "ريزو وجكن بوكس",
                 icon: "fa-box-open",
                 items: [
-                    { id: 801, name: "جكن بوكس", price: 4750, desc: "قطع دجاج مقرمش مع رز" },
-                    { id: 802, name: "جكن بوكس نكهات", price: 5750, desc: "بالجبن / تكساس / مدخن / حار" },
+                    { id: 801, name: "جكن بوكس", price: 4750, desc: "قطع دجاج مقرمش مع فنكر وصوص" },
+                    { id: 802, name: "ريزو جكن (نكهات)", price: 5750, desc: "جبن / تكساس / مدخن / باربكيو / حار" },
                     { id: 803, name: "ريزو شاورما لحم", price: 4500, desc: "" },
                     { id: 804, name: "ريزو شاورما دجاج", price: 4000, desc: "" },
                     { id: 805, name: "ريزو شاورما مشكل", price: 4500, desc: "" },
-                    { id: 806, name: "ريزو جكن سادة", price: 4500, desc: "" },
-                    { id: 807, name: "ريزو جكن بالجبن", price: 5500, desc: "" },
-                    { id: 808, name: "وجبة كريسبي (3 قطع)", price: 5750, desc: "مع فنكر وكولا" },
-                    { id: 809, name: "وجبة كريسبي (5 قطع)", price: 6750, desc: "مع فنكر وكولا" }
+                    { id: 806, name: "ريزو جكن سادة", price: 4500, desc: "" }
+                ]
+            },
+            {
+                id: "crispy",
+                title: "كريسبي",
+                icon: "fa-drumstick-bite",
+                items: [
+                    { id: 901, name: "كريسبي 2 قطع", price: 4500, desc: "" },
+                    { id: 902, name: "كريسبي 3 قطع", price: 5750, desc: "" },
+                    { id: 903, name: "كريسبي 5 قطع", price: 6750, desc: "" },
+                    { id: 904, name: "كريسبي 6 قطع", price: 8750, desc: "" }
+                ]
+            },
+            {
+                id: "kentucky",
+                title: "كنتاكي والعروض",
+                icon: "fa-bucket",
+                items: [
+                    { id: 910, name: "عرض 6 قطع كنتاكي", price: 7500, desc: "3 فنكر + 3 كولا" },
+                    { id: 911, name: "عرض 4 قطع كنتاكي", price: 4000, desc: "2 فنكر + 2 كولا" },
+                    { id: 912, name: "عرض 8 قطع كنتاكي", price: 13000, desc: "4 فنكر + 4 كولا" },
+                    { id: 913, name: "8 قطع أجنحة كنتاكي", price: 7500, desc: "مع فنكر + 2 كولا" }
+                ]
+            },
+            {
+                id: "appetizers",
+                title: "المقبلات",
+                icon: "fa-lemon",
+                items: [
+                    { id: 950, name: "مقبلات صغير", price: 2000, desc: "" },
+                    { id: 951, name: "مقبلات وسط", price: 3000, desc: "" },
+                    { id: 952, name: "مقبلات كبير", price: 4000, desc: "" }
+                ]
+            },
+            {
+                id: "drinks",
+                title: "المشروبات",
+                icon: "fa-bottle-water",
+                items: [
+                    { id: 960, name: "بيبسي", price: 500, desc: "" },
+                    { id: 961, name: "لبن", price: 500, desc: "" },
+                    { id: 962, name: "فانتا", price: 500, desc: "" },
+                    { id: 963, name: "سفن", price: 500, desc: "" },
+                    { id: 964, name: "ماء مقطر", price: 250, desc: "" }
                 ]
             },
             {
@@ -462,10 +500,7 @@
                     { id: 703, name: "لحم بعجين بيض", price: 1500, desc: "" },
                     { id: 704, name: "لحم بعجين جبن", price: 1500, desc: "" },
                     { id: 705, name: "لحم بعجين دبل جبن", price: 2000, desc: "" },
-                    { id: 706, name: "لحم بعجين دبل بيض", price: 2000, desc: "" },
-                    { id: 707, name: "مقبلات صغير", price: 2000, desc: "" },
-                    { id: 708, name: "مقبلات وسط", price: 3000, desc: "" },
-                    { id: 709, name: "مقبلات كبير", price: 4000, desc: "" }
+                    { id: 706, name: "لحم بعجين دبل بيض", price: 2000, desc: "" }
                 ]
             },
             {
@@ -541,9 +576,7 @@
         let cart = [];
         let activeCategoryIndex = 0;
 
-        // --- التهيئة ---
         window.onload = () => {
-            // إخفاء شاشة التحميل بعد 2 ثانية
             setTimeout(() => {
                 document.getElementById('splash-screen').style.opacity = '0';
                 document.getElementById('splash-screen').style.visibility = 'hidden';
@@ -556,12 +589,9 @@
             renderMenu(0);
         }
 
-        // --- رسم شريط التنقل ---
         function renderNav() {
             const navContainer = document.getElementById('navContainer');
-            const indicator = document.getElementById('navIndicator');
             
-            // تنظيف (باستثناء المؤشر)
             Array.from(navContainer.children).forEach(child => {
                 if (child.id !== 'navIndicator') child.remove();
             });
@@ -573,9 +603,8 @@
                 btn.onclick = (e) => setActiveCategory(index, e.currentTarget);
                 navContainer.appendChild(btn);
                 
-                // ضبط المؤشر للعنصر الأول
                 if (index === 0) {
-                    setTimeout(() => moveIndicator(btn), 100); // تأخير بسيط لضمان الرسم
+                    setTimeout(() => moveIndicator(btn), 100);
                 }
             });
         }
@@ -589,36 +618,29 @@
         function setActiveCategory(index, element) {
             if (activeCategoryIndex === index) return;
             
-            // تحديث الستايل
             const items = document.querySelectorAll('.nav-item');
             items.forEach(i => i.classList.remove('active'));
             element.classList.add('active');
             
-            // تحريك المؤشر
             moveIndicator(element);
-            
-            // تمرير الشريط إذا كان العنصر خارج الشاشة
             element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 
             activeCategoryIndex = index;
             renderMenu(index);
         }
 
-        // --- رسم المنتجات وعنوان القسم ---
         function renderMenu(index) {
             const category = menuData[index];
             const grid = document.getElementById('menuGrid');
             const title = document.getElementById('sectionTitleText');
             const subtitle = document.getElementById('sectionSubtitleText');
 
-            // تحديث العنوان مع انيميشن
             const headerContainer = document.getElementById('sectionHeader');
             headerContainer.style.opacity = '0';
             headerContainer.style.transform = 'translateY(10px)';
             
             setTimeout(() => {
                 title.innerText = category.title;
-                // نص فرعي عشوائي لإضافة جمالية
                 const subtitles = ["أشهى المأكولات", "طعم لا يقاوم", "محضر بعناية", "الأكثر طلباً"];
                 subtitle.innerText = subtitles[index % subtitles.length];
                 
@@ -627,15 +649,13 @@
                 headerContainer.style.transform = 'translateY(0)';
             }, 200);
 
-            // تفريغ الشبكة
             grid.innerHTML = '';
 
-            // رسم الكروت بتأثير متتابع
             category.items.forEach((item, i) => {
                 const card = document.createElement('div');
                 card.className = 'menu-card flex flex-col justify-between';
                 card.style.animation = `fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${i * 0.05}s`;
-                card.style.opacity = '0'; // البداية مخفية للأنيميشن
+                card.style.opacity = '0';
 
                 card.innerHTML = `
                     <div class="mb-4">
@@ -653,19 +673,40 @@
             });
         }
 
-        // --- منطق السلة ---
         function addToCart(btnElement, catIndex, itemId) {
             const item = menuData[catIndex].items.find(i => i.id === itemId);
             
-            // إضافة للسلة
             const existing = cart.find(i => i.id === itemId);
             if (existing) existing.qty++;
             else cart.push({ ...item, qty: 1 });
 
-            // تحديث العداد
             updateCartCount();
 
-            // --- تأثير الطيران ---
+            // --- تأثير التنبيه (Toast Notification) ---
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: false,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                },
+                background: 'rgba(255, 255, 255, 0.95)',
+                color: '#333',
+                iconColor: '#25D366',
+                customClass: {
+                    popup: 'rounded-2xl shadow-xl border border-gray-100'
+                }
+            });
+
+            Toast.fire({
+                icon: 'success',
+                title: `<span class="font-bold text-sm">تمت إضافة ${item.name}</span>`
+            });
+
+            // --- تأثير الطيران (Flying Animation) ---
             const rect = btnElement.getBoundingClientRect();
             const cartBtn = document.getElementById('cartBtn');
             const cartRect = cartBtn.getBoundingClientRect();
@@ -676,16 +717,13 @@
             flying.style.top = `${rect.top + rect.height/2 - 10}px`;
             document.body.appendChild(flying);
 
-            // تحريك للنهاية
             setTimeout(() => {
                 flying.style.transform = `translate(${cartRect.left - rect.left}px, ${cartRect.top - rect.top}px) scale(0.2)`;
                 flying.style.opacity = '0';
             }, 50);
 
-            // تنظيف
             setTimeout(() => {
                 flying.remove();
-                // هزة بسيطة للسلة
                 cartBtn.style.transform = 'scale(1.2)';
                 setTimeout(() => cartBtn.style.transform = 'scale(1)', 200);
             }, 600);
@@ -701,9 +739,7 @@
             renderCartItems();
         }
 
-        // --- عرض السلة ---
         function toggleCart() {
-            const modal = document.getElementById('cartModal');
             const backdrop = document.querySelector('.modal-backdrop');
             
             if (backdrop.classList.contains('active')) {
@@ -713,7 +749,6 @@
                 renderCartItems();
             }
             
-            // إغلاق عند الضغط في الخارج
             backdrop.onclick = (e) => {
                 if (e.target === backdrop) toggleCart();
             }
@@ -779,7 +814,6 @@
             window.open(`https://wa.me/9647705330066?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // CSS Animation Helper
         const styleSheet = document.createElement("style");
         styleSheet.innerText = `
             @keyframes fadeInUp {
