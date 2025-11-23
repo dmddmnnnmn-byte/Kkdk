@@ -2,551 +2,793 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قائمة الطعام | Menu</title>
-    <!-- خطوط عربية جميلة -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مطعم بيتزا تايم | Pizza Time</title>
+    <!-- خطوط عربية فاخرة -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- أيقونات -->
+    <!-- أيقونات FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SweetAlert2 للتنبيهات -->
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
+        /* --- متغيرات الألوان والتصميم --- */
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.25);
-            --primary-color: #ff9f1c;
-            --text-color: #2d3748;
+            --primary: #ff9f1c;
+            --primary-dark: #e67e22;
+            --accent: #2ec4b6;
+            --text-main: #2d3748;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
         }
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            min-height: 100vh;
+            background: #fdfbf7; /* لون خلفية ناعم */
+            color: var(--text-main);
             overflow-x: hidden;
-            color: var(--text-color);
-            padding-bottom: 90px;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* خلفية متحركة هادئة */
+        .animated-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #fff1e6 0%, #fff 100%);
         }
 
-        /* تنسيقات الزجاج */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-            border-radius: 20px;
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: floatBlob 25s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #ffecd2; animation-delay: 0s; }
+        .blob-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #d4fcff; animation-delay: -5s; }
+        .blob-3 { top: 40%; left: 40%; width: 300px; height: 300px; background: #ffe3e3; animation-delay: -10s; }
+
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, -40px) scale(1.1); }
         }
 
-        .glass-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2));
+        /* --- شاشة التحميل (Splash) --- */
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border-radius: 16px;
-            transition: transform 0.1s ease, box-shadow 0.3s ease;
-            transform-style: preserve-3d;
-            perspective: 1000px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+        .logo-container {
+            position: relative;
+            animation: logoEntrance 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .logo-text {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff9f1c, #ff5e62);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
         }
         
-        /* Category Buttons */
-        .category-btn {
-            background: rgba(255, 255, 255, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        @keyframes logoEntrance {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
-        .category-btn.active, .category-btn:hover {
-            background: #ff9f1c;
-            color: white;
-            border-color: #ff9f1c;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 159, 28, 0.3);
+        /* --- شريط التصنيفات (Sliding Tab) --- */
+        .nav-wrapper {
+            position: sticky;
+            top: 10px;
+            z-index: 50;
+            padding: 0 10px;
+            margin-bottom: 20px;
+        }
+        .nav-container {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.5);
+            display: flex;
+            overflow-x: auto;
+            position: relative;
+            gap: 5px;
+        }
+        .nav-container::-webkit-scrollbar { display: none; }
+        
+        .nav-item {
+            position: relative;
+            padding: 10px 20px;
             font-weight: 700;
-        }
-
-        /* Floating Cart Button */
-        .cart-float-btn {
-            position: fixed;
-            bottom: 25px;
-            left: 25px;
-            width: 75px;
-            height: 75px;
-            background: #25D366; 
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 32px;
-            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+            color: #718096;
             cursor: pointer;
-            z-index: 100;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 3px solid rgba(255,255,255,0.7);
+            white-space: nowrap;
+            z-index: 2;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .cart-float-btn:hover {
-            transform: scale(1.1) rotate(-10deg);
+        .nav-item.active {
+            color: #fff;
         }
-        .cart-badge {
+        
+        /* الخلفية المتحركة للأزرار */
+        .nav-indicator {
             position: absolute;
-            top: 0;
-            right: 0;
-            background: #ff0000;
+            height: calc(100% - 16px);
+            top: 8px;
+            left: 0; /* سيتم تحديثها بالجافاسكريبت */
+            background: linear-gradient(135deg, #ff9f1c, #f37335);
+            border-radius: 15px;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 1;
+            box-shadow: 0 4px 15px rgba(255, 159, 28, 0.4);
+        }
+
+        /* --- عنوان القسم الكبير --- */
+        .section-header-container {
+            margin: 20px 0;
+            padding: 0 15px;
+            overflow: hidden;
+        }
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUpFade 0.6s forwards;
+        }
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 35px;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        .section-subtitle {
+            font-size: 1rem;
+            color: #718096;
+            margin-right: 20px;
+            opacity: 0;
+            animation: slideUpFade 0.6s forwards 0.1s;
+        }
+
+        @keyframes slideUpFade {
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* --- كروت المنتجات --- */
+        .menu-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid #fff;
+            border-radius: 24px;
+            padding: 18px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            overflow: hidden;
+        }
+        
+        .menu-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            border-color: var(--primary);
+        }
+
+        /* تأثير اللمعان */
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            transition: 0.5s;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .menu-card:hover::before {
+            left: 100%;
+        }
+
+        .price-badge {
+            background: #fff;
+            color: var(--primary-dark);
+            font-weight: 800;
+            padding: 6px 14px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            font-size: 0.95rem;
+        }
+
+        .add-btn {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2d3748, #1a202c);
             color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .add-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* --- السلة العائمة --- */
+        .float-cart {
+            position: fixed;
+            bottom: 30px; left: 30px;
+            width: 70px; height: 70px;
+            background: #25D366;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 35px rgba(37, 211, 102, 0.35);
+            cursor: pointer;
+            z-index: 90;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 4px solid rgba(255,255,255,0.2);
+        }
+        .float-cart:hover { transform: scale(1.1) rotate(-5deg); }
+        .float-cart i { font-size: 32px; color: white; }
+        
+        .cart-counter {
+            position: absolute;
+            top: -8px; right: -8px;
+            background: #ff3b30;
+            color: white;
+            font-weight: bold;
             font-size: 14px;
-            width: 26px;
-            height: 26px;
+            min-width: 28px; height: 28px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            border: 2px solid white;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        /* Modal Overlay */
-        .modal-overlay {
+        /* --- الطيران للسلة (Animation) --- */
+        .flying-item {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(8px);
-            z-index: 200;
-            display: none;
-            justify-content: center;
-            align-items: center;
+            width: 20px; height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* --- Modal --- */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(12px);
+            z-index: 100;
             opacity: 0;
+            pointer-events: none;
             transition: opacity 0.3s;
-            padding: 15px;
         }
-        .modal-overlay.open {
-            display: flex;
+        .modal-backdrop.active {
             opacity: 1;
+            pointer-events: auto;
         }
-        .cart-modal {
-            width: 100%;
-            max-width: 450px;
+        .cart-panel {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            background: #fff;
+            border-radius: 30px 30px 0 0;
+            padding: 25px;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 101;
             max-height: 85vh;
             display: flex;
             flex-direction: column;
-            transform: scale(0.9);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
         }
-        .modal-overlay.open .cart-modal {
-            transform: scale(1);
+        .modal-backdrop.active .cart-panel {
+            transform: translateY(0);
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
-
-        .price-tag {
-            background: rgba(255, 255, 255, 0.7);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            color: #d35400;
-        }
-
-        /* Background Shapes */
-        .shape {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(50px);
-            z-index: -1;
-            animation: float 20s infinite;
-        }
-        .shape-1 { background: #ff9f1c; width: 300px; height: 300px; top: -100px; left: -100px; opacity: 0.5; }
-        .shape-2 { background: #2ec4b6; width: 400px; height: 400px; bottom: -100px; right: -100px; opacity: 0.5; }
-        
-        @keyframes float {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(20px, 20px) rotate(10deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
-        }
     </style>
 </head>
-<body class="p-3 md:p-6">
+<body>
 
-    <div class="shape shape-1"></div>
-    <div class="shape shape-2"></div>
+    <!-- خلفية متحركة -->
+    <div class="animated-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
 
-    <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <header class="text-center mb-8 relative z-10">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white drop-shadow-lg mb-2">قائمة الطعام</h1>
-            <p class="text-white text-lg opacity-90 drop-shadow-md">اطلب مباشرة عبر الواتساب</p>
+    <!-- شاشة الترحيب -->
+    <div id="splash-screen">
+        <div class="logo-container text-center">
+            <i class="fa-solid fa-pizza-slice text-6xl text-orange-500 mb-4 animate-bounce"></i>
+            <h1 class="logo-text">بيتزا تايم</h1>
+            <p class="text-gray-500 mt-2 font-medium tracking-wider">PIZZA TIME</p>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="max-w-6xl mx-auto pb-32 pt-4">
+        
+        <!-- الرأس -->
+        <header class="px-6 mb-6 flex justify-between items-center">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800">مرحباً بك 👋</h2>
+                <p class="text-gray-500 text-sm">ماذا تود أن تأكل اليوم؟</p>
+            </div>
+            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                <i class="fa-solid fa-utensils text-orange-500"></i>
+            </div>
         </header>
 
-        <!-- Categories -->
-        <div class="glass-panel p-2 mb-6 sticky top-2 z-40 overflow-x-auto whitespace-nowrap flex gap-3 no-scrollbar" id="categoryContainer"></div>
+        <!-- شريط التنقل (Tabs) -->
+        <div class="nav-wrapper">
+            <div class="nav-container" id="navContainer">
+                <div class="nav-indicator" id="navIndicator"></div>
+                <!-- سيتم توليد الأزرار هنا -->
+            </div>
+        </div>
 
-        <!-- Menu Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-24" id="menuGrid"></div>
+        <!-- عنوان القسم الحالي (فوق الكروت) -->
+        <div class="section-header-container" id="sectionHeader">
+            <h2 class="section-title" id="sectionTitleText">المشويات</h2>
+            <p class="section-subtitle" id="sectionSubtitleText">أشهى الأطباق المحضرة بعناية</p>
+        </div>
+
+        <!-- شبكة المنتجات -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 px-4" id="menuGrid">
+            <!-- سيتم توليد المنتجات هنا -->
+        </div>
+
     </div>
 
-    <!-- Floating Cart Button -->
-    <div class="cart-float-btn" onclick="toggleCart()">
+    <!-- زر السلة العائم -->
+    <div class="float-cart" id="cartBtn" onclick="toggleCart()">
         <i class="fa-brands fa-whatsapp"></i>
-        <div class="cart-badge" id="cartBadge">0</div>
+        <div class="cart-counter" id="cartBadge" style="transform: scale(0)">0</div>
     </div>
 
-    <!-- Cart Modal -->
-    <div class="modal-overlay" id="cartModalOverlay">
-        <div class="glass-panel cart-modal shadow-2xl relative">
+    <!-- نافذة السلة (Modal) -->
+    <div class="modal-backdrop" id="cartModal">
+        <div class="cart-panel" onclick="event.stopPropagation()">
+            <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6"></div>
             
-            <!-- Modal Header -->
-            <div class="p-4 border-b border-gray-200/30 flex justify-between items-center bg-white/30 sticky top-0 z-10">
-                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <i class="fa-solid fa-list-check text-orange-500"></i>
-                    قائمة طلباتك
-                </h2>
-                <button onclick="toggleCart()" class="text-gray-600 hover:text-red-500 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/50">
-                    <i class="fa-solid fa-xmark text-2xl"></i>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">سلة الطلبات</h2>
+                <button onclick="toggleCart()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-red-100 hover:text-red-500 transition">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            
-            <!-- Items Content -->
-            <div class="overflow-y-auto p-4 flex-grow custom-scroll" id="cartItemsContainer" style="min-height: 150px;">
-                <div class="text-center text-gray-500 py-10">السلة فارغة حالياً</div>
+
+            <div class="flex-grow overflow-y-auto custom-scroll mb-6 pr-2" id="cartItems">
+                <!-- عناصر السلة -->
+                <div class="text-center py-10 text-gray-400">
+                    <i class="fa-solid fa-basket-shopping text-4xl mb-3 opacity-50"></i>
+                    <p>السلة فارغة حالياً</p>
+                </div>
             </div>
 
-            <!-- Modal Footer -->
-            <div class="p-4 border-t border-gray-200/30 bg-white/30 sticky bottom-0 z-10">
-                <div class="flex justify-between items-center mb-4 text-lg font-bold text-gray-800 bg-white/40 p-3 rounded-xl shadow-sm">
-                    <span>المجموع:</span>
-                    <span id="cartTotal" class="text-orange-600 text-xl">0 د.ع</span>
+            <div class="border-t border-gray-100 pt-4">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-500 font-medium">المجموع الكلي</span>
+                    <span class="text-2xl font-extrabold text-gray-900" id="cartTotal">0 د.ع</span>
                 </div>
-                
-                <!-- Direct Whatsapp Button (No Forms) -->
-                <button onclick="sendToWhatsapp()" class="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-4 px-4 rounded-xl shadow-lg transform transition active:scale-95 flex justify-center items-center gap-3">
-                    <span class="text-lg">إرسال الطلب الآن</span>
-                    <i class="fa-brands fa-whatsapp text-3xl"></i>
+                <button onclick="checkout()" class="w-full bg-gray-900 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-3 active:scale-95 transition transform">
+                    <span>إتمام الطلب عبر واتساب</span>
+                    <i class="fa-brands fa-whatsapp text-xl"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript logic -->
     <script>
-        // Data derived from uploaded images
+        // --- البيانات ---
         const menuData = [
             {
-                category: "المشويات",
+                id: "grills",
+                title: "المشويات",
                 icon: "fa-fire",
                 items: [
-                    { id: 101, name: "نفر كباب لحم", price: 7500, desc: "لحم عراقي فاخر" },
+                    { id: 101, name: "نفر كباب لحم", price: 7500, desc: "لحم عراقي، طماطة، بصل، خبز" },
                     { id: 102, name: "نصف نفر كباب لحم", price: 5000, desc: "" },
-                    { id: 103, name: "نفر كباب دجاج", price: 6500, desc: "" },
-                    { id: 104, name: "نصف نفر كباب دجاج", price: 4500, desc: "" },
-                    { id: 105, name: "نفر تكه دجاج", price: 7000, desc: "" },
-                    { id: 106, name: "نفر مشكل كباب", price: 7500, desc: "" },
-                    { id: 107, name: "نفر اجنحة", price: 7000, desc: "مشوي على الفحم" },
-                    { id: 108, name: "نفر كباب لحم مع التمن", price: 8500, desc: "مع السلطة والخبز" },
-                    { id: 109, name: "كيلو كباب لحم سفري", price: 18000, desc: "عرض خاص" },
-                    { id: 110, name: "دجاج مشوي", price: 8500, desc: "مع السلطة والخبز" },
-                    { id: 111, name: "نصف دجاج مشوي", price: 4500, desc: "" }
+                    { id: 103, name: "نفر كباب دجاج", price: 7000, desc: "" },
+                    { id: 104, name: "نصف نفر كباب دجاج", price: 5000, desc: "" },
+                    { id: 105, name: "نفر تكة دجاج", price: 7500, desc: "صدر دجاج بتتبيلة خاصة" },
+                    { id: 106, name: "نصف نفر تكة دجاج", price: 5000, desc: "" },
+                    { id: 107, name: "نفر أجنحة مشوي", price: 7500, desc: "" },
+                    { id: 108, name: "نفر مشكل", price: 8000, desc: "كباب، تكة، دجاج" },
+                    { id: 109, name: "نصف نفر مشكل", price: 5500, desc: "" },
+                    { id: 110, name: "دجاج مشوي", price: 8500, desc: "مع المقبلات والخبز" },
+                    { id: 111, name: "نصف دجاج مشوي", price: 4500, desc: "" },
+                    { id: 112, name: "كيلو كباب لحم", price: 18000, desc: "سفري" },
+                    { id: 113, name: "كيلو كباب دجاج", price: 9750, desc: "سفري" },
+                    { id: 114, name: "كيلو تكة دجاج", price: 12000, desc: "سفري" },
+                    { id: 115, name: "كيلو أجنحة", price: 12000, desc: "سفري" }
                 ]
             },
             {
-                category: "شاورما وبركر",
-                icon: "fa-burger",
+                id: "chicken_box",
+                title: "ريزو وجكن بوكس",
+                icon: "fa-box-open",
                 items: [
-                    { id: 201, name: "نفر شاورما لحم", price: 4500, desc: "مع التمن والسلطة والصمون" },
-                    { id: 202, name: "نفر شاورما دجاج", price: 4000, desc: "مع التمن والسلطة والصمون" },
-                    { id: 203, name: "سندويج شاورما لحم", price: 3000, desc: "مشوي بالطماطة والفلفل" },
-                    { id: 204, name: "سندويج شاورما دجاج", price: 2750, desc: "" },
-                    { id: 205, name: "همبركر لحم", price: 2750, desc: "لحم عراقي صافي" },
-                    { id: 206, name: "همبركر لحم مع الجبن", price: 3000, desc: "" },
-                    { id: 207, name: "همبركر كنتاكي", price: 3000, desc: "" },
-                    { id: 208, name: "بركر لحم مع شاورما", price: 4000, desc: "سبيشال بركر تايم" },
-                    { id: 209, name: "بركر لحم بالفطر", price: 3500, desc: "" }
+                    { id: 801, name: "جكن بوكس", price: 4750, desc: "قطع دجاج مقرمش مع رز" },
+                    { id: 802, name: "جكن بوكس نكهات", price: 5750, desc: "بالجبن / تكساس / مدخن / حار" },
+                    { id: 803, name: "ريزو شاورما لحم", price: 4500, desc: "" },
+                    { id: 804, name: "ريزو شاورما دجاج", price: 4000, desc: "" },
+                    { id: 805, name: "ريزو شاورما مشكل", price: 4500, desc: "" },
+                    { id: 806, name: "ريزو جكن سادة", price: 4500, desc: "" },
+                    { id: 807, name: "ريزو جكن بالجبن", price: 5500, desc: "" },
+                    { id: 808, name: "وجبة كريسبي (3 قطع)", price: 5750, desc: "مع فنكر وكولا" },
+                    { id: 809, name: "وجبة كريسبي (5 قطع)", price: 6750, desc: "مع فنكر وكولا" }
                 ]
             },
             {
-                category: "البيتزا",
+                id: "lahm",
+                title: "لحم بعجين",
+                icon: "fa-cookie-bite",
+                items: [
+                    { id: 701, name: "لحم بعجين عادي", price: 1000, desc: "من الفرن مباشرة" },
+                    { id: 702, name: "لحم بعجين دبل", price: 1500, desc: "حشوة مضاعفة" },
+                    { id: 703, name: "لحم بعجين بيض", price: 1500, desc: "" },
+                    { id: 704, name: "لحم بعجين جبن", price: 1500, desc: "" },
+                    { id: 705, name: "لحم بعجين دبل جبن", price: 2000, desc: "" },
+                    { id: 706, name: "لحم بعجين دبل بيض", price: 2000, desc: "" },
+                    { id: 707, name: "مقبلات صغير", price: 2000, desc: "" },
+                    { id: 708, name: "مقبلات وسط", price: 3000, desc: "" },
+                    { id: 709, name: "مقبلات كبير", price: 4000, desc: "" }
+                ]
+            },
+            {
+                id: "shawarma",
+                title: "الشاورما",
+                icon: "fa-layer-group",
+                items: [
+                    { id: 201, name: "سندويج شاورما لحم", price: 2500, desc: "" },
+                    { id: 202, name: "سندويج شاورما دجاج", price: 2500, desc: "" },
+                    { id: 203, name: "سندويج شاورما مشكل", price: 2500, desc: "" },
+                    { id: 204, name: "طبق شاورما لحم", price: 7500, desc: "مع المقبلات" },
+                    { id: 205, name: "طبق شاورما دجاج", price: 7000, desc: "مع المقبلات" },
+                    { id: 206, name: "نصف طبق شاورما لحم", price: 4500, desc: "" },
+                    { id: 207, name: "نصف طبق شاورما دجاج", price: 4000, desc: "" },
+                    { id: 208, name: "سندويج سكالوب", price: 2500, desc: "" }
+                ]
+            },
+            {
+                id: "pizza",
+                title: "البيتزا",
                 icon: "fa-pizza-slice",
                 items: [
-                    { id: 301, name: "بيتزا مارغريتا (وسط)", price: 4000, desc: "" },
-                    { id: 302, name: "بيتزا مارغريتا (كبير)", price: 6000, desc: "" },
-                    { id: 303, name: "بيتزا شاورما لحم (وسط)", price: 6000, desc: "" },
-                    { id: 304, name: "بيتزا شاورما لحم (كبير)", price: 8000, desc: "" },
-                    { id: 305, name: "بيتزا شاورما دجاج (وسط)", price: 6000, desc: "" },
-                    { id: 306, name: "بيتزا شاورما دجاج (كبير)", price: 8000, desc: "" },
-                    { id: 307, name: "بيتزا سجق (وسط)", price: 6000, desc: "" },
-                    { id: 308, name: "بيتزا سجق (كبير)", price: 8000, desc: "" }
+                    { id: 301, name: "بيتزا مارغريتا", price: 4000, desc: "وسط (كبير 6000 / صغير 2500)" },
+                    { id: 302, name: "بيتزا شاورما لحم", price: 6000, desc: "وسط" },
+                    { id: 303, name: "بيتزا شاورما دجاج", price: 6000, desc: "وسط" },
+                    { id: 304, name: "بيتزا مشكل", price: 6000, desc: "لحم ودجاج" },
+                    { id: 305, name: "بيتزا سجق", price: 6000, desc: "" },
+                    { id: 306, name: "بيتزا خضروات", price: 5000, desc: "" },
+                    { id: 307, name: "بيتزا كباب", price: 6000, desc: "" }
                 ]
             },
             {
-                category: "كنتاكي وكريسبي",
-                icon: "fa-drumstick-bite",
+                id: "burger",
+                title: "همبركر",
+                icon: "fa-burger",
                 items: [
-                    { id: 401, name: "وجبة كريسبي (2 قطع)", price: 4500, desc: "مع فنكر وكولا" },
-                    { id: 402, name: "وجبة كريسبي (3 قطع)", price: 5750, desc: "مع فنكر وكولا" },
-                    { id: 403, name: "وجبة كريسبي (5 قطع)", price: 6750, desc: "2 فنكر + 2 كولا" },
-                    { id: 404, name: "وجبة كنتاكي (4 قطع)", price: 7500, desc: "2 فنكر + 2 كولا" },
-                    { id: 405, name: "وجبة كنتاكي (8 قطع)", price: 12750, desc: "وجبة عائلية" }
+                    { id: 401, name: "همبركر لحم", price: 2750, desc: "" },
+                    { id: 402, name: "همبركر لحم جبن", price: 3000, desc: "" },
+                    { id: 403, name: "همبركر دجاج", price: 2500, desc: "" },
+                    { id: 404, name: "همبركر دجاج جبن", price: 2750, desc: "" },
+                    { id: 405, name: "همبركر كنتاكي", price: 3500, desc: "" },
+                    { id: 406, name: "سندويج كباب", price: 2500, desc: "" },
+                    { id: 407, name: "سندويج فلافل", price: 1000, desc: "" }
                 ]
             },
             {
-                category: "صاج وكومبير",
+                id: "saj",
+                title: "صاجات",
                 icon: "fa-utensils",
                 items: [
                     { id: 501, name: "صاج شاورما لحم", price: 5000, desc: "" },
                     { id: 502, name: "صاج شاورما دجاج", price: 4500, desc: "" },
-                    { id: 503, name: "صاج همبركر", price: 4000, desc: "" },
-                    { id: 504, name: "كومبير بالدجاج", price: 4500, desc: "بطاطا مشوية تركية" },
-                    { id: 505, name: "كومبير باللحم", price: 5000, desc: "" },
-                    { id: 506, name: "كومبير مشكل", price: 5500, desc: "" }
+                    { id: 503, name: "صاج شاورما مشكل", price: 5000, desc: "" },
+                    { id: 504, name: "صاج همبركر", price: 4500, desc: "" },
+                    { id: 505, name: "صاج سكالوب", price: 4000, desc: "" }
                 ]
             },
             {
-                category: "مقبلات وكشري",
+                id: "koshary",
+                title: "كشري وسباغيتي",
                 icon: "fa-bowl-food",
                 items: [
-                    { id: 601, name: "كشري بالدجاج", price: 4000, desc: "أكل مصري أصلي" },
-                    { id: 602, name: "كشري سادة", price: 4500, desc: "" },
-                    { id: 603, name: "ماعون فنكر صغير", price: 1000, desc: "" },
-                    { id: 604, name: "ماعون فنكر كبير بالجبن", price: 3000, desc: "" },
-                    { id: 605, name: "حلقات بصل تركي (وسط)", price: 3000, desc: "9 حلقات" },
-                    { id: 606, name: "مقبلات مشكلة (وسط)", price: 3000, desc: "" }
-                ]
-            },
-            {
-                category: "العروض",
-                icon: "fa-gift",
-                items: [
-                    { id: 701, name: "عرض فوريو", price: 6000, desc: "فلافل + بيتزا + فنكر + كولا" },
-                    { id: 702, name: "عرض سوبر", price: 13750, desc: "3 بيتزا + فلافل + فنكر + مقبلات" },
-                    { id: 703, name: "عرض خاص (مشكل)", price: 10750, desc: "همبركر + قص + كباب + صاج..." },
-                    { id: 704, name: "عرض خاص (لحم بعجين)", price: 10750, desc: "همبركر + قص + 3 لحم بعجين..." }
+                    { id: 601, name: "كشري دجاج", price: 4500, desc: "" },
+                    { id: 602, name: "كشري سادة", price: 3750, desc: "" },
+                    { id: 603, name: "كشري لحم", price: 5000, desc: "" },
+                    { id: 604, name: "سباغيتي لحم", price: 5000, desc: "" },
+                    { id: 605, name: "سباغيتي دجاج", price: 4500, desc: "" },
+                    { id: 606, name: "سباغيتي خضار", price: 3500, desc: "" }
                 ]
             }
         ];
 
         let cart = [];
-        let activeCategory = menuData[0].category;
+        let activeCategoryIndex = 0;
 
-        // Render Categories
-        const categoryContainer = document.getElementById('categoryContainer');
-        function renderCategories() {
-            categoryContainer.innerHTML = '';
-            menuData.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.className = `category-btn px-4 py-2 rounded-full text-gray-800 font-bold whitespace-nowrap flex items-center gap-2 shadow-sm ${cat.category === activeCategory ? 'active' : ''}`;
-                btn.innerHTML = `<i class="fa-solid ${cat.icon}"></i> ${cat.category}`;
-                btn.onclick = () => {
-                    activeCategory = cat.category;
-                    renderCategories();
-                    renderMenu();
-                };
-                categoryContainer.appendChild(btn);
+        // --- التهيئة ---
+        window.onload = () => {
+            // إخفاء شاشة التحميل بعد 2 ثانية
+            setTimeout(() => {
+                document.getElementById('splash-screen').style.opacity = '0';
+                document.getElementById('splash-screen').style.visibility = 'hidden';
+                initApp();
+            }, 2000);
+        };
+
+        function initApp() {
+            renderNav();
+            renderMenu(0);
+        }
+
+        // --- رسم شريط التنقل ---
+        function renderNav() {
+            const navContainer = document.getElementById('navContainer');
+            const indicator = document.getElementById('navIndicator');
+            
+            // تنظيف (باستثناء المؤشر)
+            Array.from(navContainer.children).forEach(child => {
+                if (child.id !== 'navIndicator') child.remove();
+            });
+
+            menuData.forEach((cat, index) => {
+                const btn = document.createElement('div');
+                btn.className = `nav-item ${index === 0 ? 'active' : ''}`;
+                btn.innerHTML = `<i class="fa-solid ${cat.icon}"></i> ${cat.title}`;
+                btn.onclick = (e) => setActiveCategory(index, e.currentTarget);
+                navContainer.appendChild(btn);
+                
+                // ضبط المؤشر للعنصر الأول
+                if (index === 0) {
+                    setTimeout(() => moveIndicator(btn), 100); // تأخير بسيط لضمان الرسم
+                }
             });
         }
 
-        // Render Menu Grid
-        const menuGrid = document.getElementById('menuGrid');
-        function renderMenu() {
-            menuGrid.innerHTML = '';
-            const categoryData = menuData.find(c => c.category === activeCategory);
+        function moveIndicator(element) {
+            const indicator = document.getElementById('navIndicator');
+            indicator.style.width = `${element.offsetWidth}px`;
+            indicator.style.left = `${element.offsetLeft}px`;
+        }
+
+        function setActiveCategory(index, element) {
+            if (activeCategoryIndex === index) return;
             
-            categoryData.items.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = 'glass-card p-4 relative flex flex-col justify-between h-full group cursor-pointer select-none';
-                card.style.opacity = '0';
-                card.style.animation = `fadeInUp 0.5s ease forwards ${index * 0.05}s`;
+            // تحديث الستايل
+            const items = document.querySelectorAll('.nav-item');
+            items.forEach(i => i.classList.remove('active'));
+            element.classList.add('active');
+            
+            // تحريك المؤشر
+            moveIndicator(element);
+            
+            // تمرير الشريط إذا كان العنصر خارج الشاشة
+            element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+            activeCategoryIndex = index;
+            renderMenu(index);
+        }
+
+        // --- رسم المنتجات وعنوان القسم ---
+        function renderMenu(index) {
+            const category = menuData[index];
+            const grid = document.getElementById('menuGrid');
+            const title = document.getElementById('sectionTitleText');
+            const subtitle = document.getElementById('sectionSubtitleText');
+
+            // تحديث العنوان مع انيميشن
+            const headerContainer = document.getElementById('sectionHeader');
+            headerContainer.style.opacity = '0';
+            headerContainer.style.transform = 'translateY(10px)';
+            
+            setTimeout(() => {
+                title.innerText = category.title;
+                // نص فرعي عشوائي لإضافة جمالية
+                const subtitles = ["أشهى المأكولات", "طعم لا يقاوم", "محضر بعناية", "الأكثر طلباً"];
+                subtitle.innerText = subtitles[index % subtitles.length];
                 
+                headerContainer.style.transition = 'all 0.5s ease';
+                headerContainer.style.opacity = '1';
+                headerContainer.style.transform = 'translateY(0)';
+            }, 200);
+
+            // تفريغ الشبكة
+            grid.innerHTML = '';
+
+            // رسم الكروت بتأثير متتابع
+            category.items.forEach((item, i) => {
+                const card = document.createElement('div');
+                card.className = 'menu-card flex flex-col justify-between';
+                card.style.animation = `fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${i * 0.05}s`;
+                card.style.opacity = '0'; // البداية مخفية للأنيميشن
+
                 card.innerHTML = `
-                    <div class="mb-2">
-                        <div class="flex justify-between items-start mb-1">
-                            <h3 class="text-lg font-bold text-gray-900 leading-tight">${item.name}</h3>
-                        </div>
-                        <p class="text-sm text-gray-700 opacity-80 line-clamp-2">${item.desc || ''}</p>
+                    <div class="mb-4">
+                        <h3 class="text-lg font-extrabold text-gray-800 leading-tight mb-1">${item.name}</h3>
+                        <p class="text-sm text-gray-500 font-medium">${item.desc || ''}</p>
                     </div>
-                    <div class="flex justify-between items-center mt-auto pt-2 border-t border-white/40">
-                        <span class="price-tag text-sm">${item.price.toLocaleString()} د.ع</span>
-                        <button onclick="addToCart(${item.id})" class="w-9 h-9 rounded-full bg-orange-500 text-white flex items-center justify-center hover:bg-orange-600 transition-all transform active:scale-90 shadow-md">
+                    <div class="flex justify-between items-center mt-auto">
+                        <span class="price-badge">${item.price.toLocaleString()} د.ع</span>
+                        <div class="add-btn" onclick="addToCart(this, ${index}, ${item.id})">
                             <i class="fa-solid fa-plus"></i>
-                        </button>
+                        </div>
                     </div>
                 `;
-
-                card.addEventListener('mousemove', handleTilt);
-                card.addEventListener('mouseleave', resetTilt);
-
-                menuGrid.appendChild(card);
+                grid.appendChild(card);
             });
         }
 
-        // Cart Logic
-        function addToCart(itemId) {
-            let itemToAdd = null;
-            menuData.forEach(cat => {
-                const found = cat.items.find(i => i.id === itemId);
-                if(found) itemToAdd = found;
-            });
+        // --- منطق السلة ---
+        function addToCart(btnElement, catIndex, itemId) {
+            const item = menuData[catIndex].items.find(i => i.id === itemId);
+            
+            // إضافة للسلة
+            const existing = cart.find(i => i.id === itemId);
+            if (existing) existing.qty++;
+            else cart.push({ ...item, qty: 1 });
 
-            if(!itemToAdd) return;
+            // تحديث العداد
+            updateCartCount();
 
-            const existingItem = cart.find(i => i.id === itemId);
-            if(existingItem) {
-                existingItem.qty++;
+            // --- تأثير الطيران ---
+            const rect = btnElement.getBoundingClientRect();
+            const cartBtn = document.getElementById('cartBtn');
+            const cartRect = cartBtn.getBoundingClientRect();
+
+            const flying = document.createElement('div');
+            flying.className = 'flying-item';
+            flying.style.left = `${rect.left + rect.width/2 - 10}px`;
+            flying.style.top = `${rect.top + rect.height/2 - 10}px`;
+            document.body.appendChild(flying);
+
+            // تحريك للنهاية
+            setTimeout(() => {
+                flying.style.transform = `translate(${cartRect.left - rect.left}px, ${cartRect.top - rect.top}px) scale(0.2)`;
+                flying.style.opacity = '0';
+            }, 50);
+
+            // تنظيف
+            setTimeout(() => {
+                flying.remove();
+                // هزة بسيطة للسلة
+                cartBtn.style.transform = 'scale(1.2)';
+                setTimeout(() => cartBtn.style.transform = 'scale(1)', 200);
+            }, 600);
+        }
+
+        function updateCartCount() {
+            const total = cart.reduce((sum, i) => sum + i.qty, 0);
+            const badge = document.getElementById('cartBadge');
+            badge.innerText = total;
+            if (total > 0) badge.style.transform = 'scale(1)';
+            else badge.style.transform = 'scale(0)';
+            
+            renderCartItems();
+        }
+
+        // --- عرض السلة ---
+        function toggleCart() {
+            const modal = document.getElementById('cartModal');
+            const backdrop = document.querySelector('.modal-backdrop');
+            
+            if (backdrop.classList.contains('active')) {
+                backdrop.classList.remove('active');
             } else {
-                cart.push({ ...itemToAdd, qty: 1 });
+                backdrop.classList.add('active');
+                renderCartItems();
             }
-
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top',
-                showConfirmButton: false,
-                timer: 1000,
-                background: 'rgba(255, 255, 255, 0.95)',
-                color: '#333'
-            });
-            toast.fire({ icon: 'success', title: 'تمت الإضافة للسلة' });
-
-            updateCartUI();
-        }
-
-        function removeFromCart(itemId) {
-            cart = cart.filter(i => i.id !== itemId);
-            updateCartUI();
-        }
-
-        function changeQty(itemId, delta) {
-            const item = cart.find(i => i.id === itemId);
-            if (item) {
-                item.qty += delta;
-                if (item.qty <= 0) removeFromCart(itemId);
-                else updateCartUI();
+            
+            // إغلاق عند الضغط في الخارج
+            backdrop.onclick = (e) => {
+                if (e.target === backdrop) toggleCart();
             }
         }
 
-        function updateCartUI() {
-            // Badge
-            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-            document.getElementById('cartBadge').innerText = totalQty;
-            document.getElementById('cartBadge').style.display = totalQty > 0 ? 'flex' : 'none';
-
-            // Items Container
-            const container = document.getElementById('cartItemsContainer');
+        function renderCartItems() {
+            const container = document.getElementById('cartItems');
             const totalEl = document.getElementById('cartTotal');
             
             if (cart.length === 0) {
-                container.innerHTML = `<div class="flex flex-col items-center justify-center py-8 text-gray-500 opacity-70">
-                    <i class="fa-solid fa-cart-arrow-down text-6xl mb-4"></i>
-                    <p>السلة فارغة</p>
-                </div>`;
-                totalEl.innerText = "0 د.ع";
+                container.innerHTML = `
+                    <div class="text-center py-10 text-gray-400">
+                        <i class="fa-solid fa-basket-shopping text-4xl mb-3 opacity-50"></i>
+                        <p>السلة فارغة حالياً</p>
+                    </div>
+                `;
+                totalEl.innerText = '0 د.ع';
                 return;
             }
 
-            let totalPrice = 0;
-            let html = '';
-
-            cart.forEach(item => {
-                const itemTotal = item.price * item.qty;
-                totalPrice += itemTotal;
-                html += `
-                    <div class="flex justify-between items-center mb-3 bg-white/50 p-3 rounded-lg border border-white/60 shadow-sm">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-gray-800 text-sm">${item.name}</h4>
-                            <div class="text-xs text-gray-600">${item.price.toLocaleString()} د.ع</div>
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                total += item.price * item.qty;
+                return `
+                    <div class="flex justify-between items-center mb-4 p-3 bg-gray-50 rounded-xl">
+                        <div>
+                            <h4 class="font-bold text-gray-800">${item.name}</h4>
+                            <p class="text-sm text-gray-500">${item.price.toLocaleString()} د.ع</p>
                         </div>
-                        <div class="flex items-center gap-3 bg-white/70 rounded-full px-2 py-1 shadow-inner mx-2">
-                            <button onclick="changeQty(${item.id}, -1)" class="w-6 h-6 rounded-full bg-red-100 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center font-bold text-xs transition">-</button>
-                            <span class="font-bold text-gray-800 w-4 text-center text-sm">${item.qty}</span>
-                            <button onclick="changeQty(${item.id}, 1)" class="w-6 h-6 rounded-full bg-green-100 text-green-600 hover:bg-green-500 hover:text-white flex items-center justify-center font-bold text-xs transition">+</button>
-                        </div>
-                        <div class="font-bold text-gray-700 text-sm w-16 text-left">
-                            ${itemTotal.toLocaleString()}
+                        <div class="flex items-center gap-3">
+                            <button onclick="changeQty(${item.id}, -1)" class="w-8 h-8 bg-white rounded-full shadow flex items-center justify-center text-red-500 font-bold">-</button>
+                            <span class="font-bold w-6 text-center">${item.qty}</span>
+                            <button onclick="changeQty(${item.id}, 1)" class="w-8 h-8 bg-white rounded-full shadow flex items-center justify-center text-green-600 font-bold">+</button>
                         </div>
                     </div>
                 `;
-            });
+            }).join('');
 
-            container.innerHTML = html;
-            totalEl.innerText = totalPrice.toLocaleString() + " د.ع";
+            totalEl.innerText = total.toLocaleString() + ' د.ع';
         }
 
-        function toggleCart() {
-            const modal = document.getElementById('cartModalOverlay');
-            if (modal.classList.contains('open')) {
-                modal.classList.remove('open');
-            } else {
-                modal.classList.add('open');
-                updateCartUI();
+        function changeQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+                updateCartCount();
             }
         }
 
-        document.getElementById('cartModalOverlay').addEventListener('click', (e) => {
-            if(e.target === document.getElementById('cartModalOverlay')) toggleCart();
-        });
+        function checkout() {
+            if (cart.length === 0) return;
 
-        // --- Fast Checkout Function (No Validation) ---
-        function sendToWhatsapp() {
-            if (cart.length === 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    text: 'السلة فارغة',
-                    confirmButtonColor: '#ff9f1c',
-                    timer: 1500
-                });
-                return;
-            }
-
-            // Construct simple message
-            let message = `*مرحباً، أرغب بطلب هذه القائمة:* \n\n`;
-            
+            let msg = `*طلب جديد - بيتزا تايم* 🍕\n\n`;
             let total = 0;
-            cart.forEach((item, i) => {
-                const itemTotal = item.price * item.qty;
-                total += itemTotal;
-                message += `▪️ ${item.name} (العدد: ${item.qty})\n`;
+            cart.forEach(item => {
+                msg += `▪️ ${item.name} (x${item.qty})\n`;
+                total += item.price * item.qty;
             });
-            
-            message += `\n*المجموع: ${total.toLocaleString()} د.ع*\n`;
-            message += `\n(يرجى إرسال العنوان لتأكيد الطلب)`;
+            msg += `\n*المجموع: ${total.toLocaleString()} د.ع*`;
+            msg += `\n\n📍 يرجى إرسال الموقع (Location)`;
 
-            const phoneNumber = "9647705330066"; 
-            const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-
-            window.open(url, '_blank');
+            window.open(`https://wa.me/9647705330066?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // Tilt logic
-        function handleTilt(e) {
-            const card = e.currentTarget;
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const rotateX = ((y - centerY) / centerY) * -5;
-            const rotateY = ((x - centerX) / centerX) * 5;
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
-        }
-        function resetTilt(e) {
-            e.currentTarget.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
-        }
-
-        // Init
+        // CSS Animation Helper
         const styleSheet = document.createElement("style");
-        styleSheet.innerText = `@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }`;
+        styleSheet.innerText = `
+            @keyframes fadeInUp {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
         document.head.appendChild(styleSheet);
-        renderCategories();
-        renderMenu();
+
     </script>
 </body>
 </html>
